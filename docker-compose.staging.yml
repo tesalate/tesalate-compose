@@ -4,9 +4,7 @@ services:
   api:
     image: devintyler2626/tesalate-api:staging
     container_name: api-staging
-    env_file:
-      - .env.staging
-      
+
   data-collector:
     container_name: data-collector-staging
     env_file: 
@@ -14,20 +12,15 @@ services:
 
   mongo-0:
     container_name: mongo-0-staging
-    env_file:
-      - .env.staging
+
 
   mongo-1:
     container_name: mongo-1-staging
-    env_file:
-      - .env.staging
+
 
   mongo-2:
     container_name: mongo-2-staging
-    env_file:
-      - .env.staging
+
 
   mongoclient:
     container_name: mongoclient-staging
-    env_file:
-      - .env.staging

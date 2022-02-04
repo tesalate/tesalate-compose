@@ -21,6 +21,7 @@ let PATH = path.resolve(__dirname, '..');
 let defaultAll = false;
 let overwriteEnvs = true;
 let generateHash = false;
+let startDocker = false;
 let BUILD_ENVIRONMENT = 'dev';
 let PUBLIC_URL = 'http://localhost:4400';
 let APP_NAME = 'Tesalate';
@@ -350,11 +351,22 @@ async function askCORSQuestions() {
   ACCEPTED_CORS = answer1.accepted_cors.split(',').map((el) => `"${el.trim()}"`);
 }
 
+async function askStartDocker() {
+  const answers = await inquirer.prompt({
+    name: 'start_docker',
+    type: 'list',
+    message: 'Start Docker?\n',
+    choices: ['yes', 'no'],
+  });
+
+  startDocker = answers.start_docker === 'yes';
+}
+
 await welcome();
 await pathSelect();
 await envSelect();
 
-const envExportPath = BUILD_ENVIRONMENT === 'dev' ? `${PATH}/tesalate-compose/.env` : `${PATH}/tesalate-compose/.env.${BUILD_ENVIRONMENT}`;
+const envExportPath = `${PATH}/tesalate-compose/.env`;
 const envExists = fs.existsSync(envExportPath);
 const keyfilePath = `${PATH}/mongo/${BUILD_ENVIRONMENT}/keyfile`;
 const dataPath = `${PATH}/mongo/${BUILD_ENVIRONMENT}/data`;
@@ -411,6 +423,8 @@ if (overwriteEnvs) {
   }
   console.clear();
 }
+
+await askStartDocker();
 
 let fig = figlet.textSync(`${BUILD_ENVIRONMENT.toUpperCase()} ENV`, {
   width: 80,
@@ -477,28 +491,31 @@ try {
     console.log(`${chalk.bgBlue(text)}`.trimStart());
   }
 
-  let command;
-
-  switch (BUILD_ENVIRONMENT) {
-    case 'prod':
-      command = 'docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d';
-      break;
-    case 'staging':
-      command = 'docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d';
-      break;
-    default:
-      command = 'docker compose up -d';
-      break;
-  }
   spinner.clear();
-  spinner.start({ text: '🐳 Staring Docker 🐳\n' });
-  const { stdout, stderr } = await exec(command);
-  if (stderr) {
-    spinner.error({ text: `stderr: ${stderr}` });
-    process.exit(1);
+
+  if (startDocker) {
+    let command;
+
+    switch (BUILD_ENVIRONMENT) {
+      case 'prod':
+        command = 'docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d';
+        break;
+      case 'staging':
+        command = 'docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d';
+        break;
+      default:
+        command = 'docker compose up -d';
+        break;
+    }
+    spinner.start({ text: '🐳 Staring Docker 🐳\n' });
+    const { stdout, stderr } = await exec(command);
+    if (stderr) {
+      spinner.error({ text: `stderr: ${stderr}` });
+      process.exit(1);
+    }
+    console.log(`stdout: ${stdout}`);
+    spinner.success({ text: `Docker has started` });
   }
-  console.log(`stdout: ${stdout}`);
-  spinner.success({ text: `Docker has started` });
 } catch (err) {
   console.error(err);
   process.exit(1);
