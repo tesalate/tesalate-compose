@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import util from 'util';
+import path from 'path';
 import crypto from 'crypto';
 import child_process from 'child_process';
 import chalk from 'chalk';
@@ -9,9 +10,14 @@ import inquirer from 'inquirer';
 import gradient from 'gradient-string';
 import chalkAnimation from 'chalk-animation';
 import { createSpinner } from 'nanospinner';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const exec = util.promisify(child_process.exec);
 
+let PATH = path.resolve(__dirname, '..');
 let defaultAll = false;
 let overwriteEnvs = true;
 let generateHash = false;
@@ -57,6 +63,19 @@ async function welcome() {
   rainbowTitle.stop();
 }
 
+async function pathSelect() {
+  const answers = await inquirer.prompt({
+    name: 'question_1',
+    type: 'input',
+    message: 'Where would you like run this script?',
+    default() {
+      return PATH;
+    },
+  });
+
+  PATH = answers.question_1;
+}
+
 async function envSelect() {
   const answers = await inquirer.prompt({
     name: 'question_1',
@@ -72,7 +91,7 @@ async function askOverwriteEnvs() {
   const answers = await inquirer.prompt({
     name: 'question_1',
     type: 'list',
-    message: `Overwrite your current ${path} file?\n`,
+    message: `Overwrite your current ${envExportPath} file?\n`,
     choices: ['yes', 'no'],
   });
 
@@ -332,33 +351,38 @@ async function askCORSQuestions() {
 }
 
 await welcome();
+await pathSelect();
 await envSelect();
 
-const path = BUILD_ENVIRONMENT === 'dev' ? `./.env` : `./.env.${BUILD_ENVIRONMENT}`;
-const envExists = fs.existsSync(path);
-const keyfilePath = `../mongo/${BUILD_ENVIRONMENT}/keyfile/file.key`;
+const envExportPath = BUILD_ENVIRONMENT === 'dev' ? `${PATH}/tesalate-compose/.env` : `${PATH}/tesalate-compose/.env.${BUILD_ENVIRONMENT}`;
+const envExists = fs.existsSync(envExportPath);
+const keyfilePath = `${PATH}/mongo/${BUILD_ENVIRONMENT}/keyfile`;
+const dataPath = `${PATH}/mongo/${BUILD_ENVIRONMENT}/data`;
 const keyExists = fs.existsSync(keyfilePath);
-const flagExists = fs.existsSync(`../mongo/${BUILD_ENVIRONMENT}/mongostatus/mongo-init.flag`);
 
 if (envExists) {
   await askOverwriteEnvs();
 }
 
+await exec(`mkdir -p ${dataPath}/mongo-0`);
+await exec(`mkdir -p ${dataPath}/mongo-1`);
+await exec(`mkdir -p ${dataPath}/mongo-2`);
+
 if (!keyExists) {
   spinner.start({ text: 'Creating keyfile for mongo\n' });
-  const { stderr: stderr1 } = await exec(`openssl rand -base64 756 > ${keyfilePath}`);
+  const { stderr: stderr1 } = await exec(`mkdir -p ${keyfilePath} && openssl rand -base64 756 > ${keyfilePath}/file.key`);
 
   if (stderr1) {
     spinner.error({ text: `stderr: ${stderr1}\n` });
   } else {
-    const successMessage = `Created Keyfile: ${keyfilePath}`;
+    const successMessage = `Created Keyfile: ${keyfilePath}/file.key`;
     spinner.success({ text: `${chalk.bgBlue(successMessage)}` });
   }
 
   spinner.clear();
   spinner.start({ text: 'Granting keyfile permissions\n' });
 
-  const { stderr: stderr2 } = await exec(`chmod 600 ${keyfilePath}`);
+  const { stderr: stderr2 } = await exec(`chmod 600 ${keyfilePath}/file.key`);
   if (stderr2) {
     spinner.error({ text: `stderr: ${stderr2}\n` });
   } else {
@@ -448,8 +472,8 @@ ACCEPTED_CORS=[${ACCEPTED_CORS}]
 
 try {
   if (overwriteEnvs) {
-    fs.writeFileSync(path, content);
-    const text = `Generated variables in: ${path}`;
+    fs.writeFileSync(envExportPath, content);
+    const text = `Generated variables in: ${envExportPath}`;
     console.log(`${chalk.bgBlue(text)}`.trimStart());
   }
 
@@ -463,7 +487,7 @@ try {
       command = 'docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d';
       break;
     default:
-      command = 'docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d';
+      command = 'docker compose up -d';
       break;
   }
   spinner.clear();

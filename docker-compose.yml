@@ -2,12 +2,12 @@ version: '3.9'
 
 services:
   api:
-    image: devintyler2626/tesalate-api
     build:
       context: ../main-api/
       dockerfile: Dockerfile
     volumes:
-      - ../main-api/:/home/node/app/
+      - ./logs/api:/home/node/app/logs
+      - ../main-api:/home/node/app/
     container_name: api
     ports:
       - '4400:4400'
@@ -24,7 +24,7 @@ services:
       test: curl --fail http://api:4400 || exit 1 
       interval: 10s
       start_period: 30s  
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn dev -L"]
 
   data-collector:
     build:
