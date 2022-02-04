@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: api-dev
+    env_file:
+      - .env.dev
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn dev -L"]
+    
+  data-collector:
+    container_name: data-collector-dev
+    env_file: 
+      - .env.dev
+
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn dev -L"]
+
+  mongo-0:
+    container_name: mongo-0-dev
+    env_file:
+      - .env.dev
+
+  mongo-1:
+    container_name: mongo-1-dev
+    env_file:
+      - .env.dev
+
+  mongo-2:
+    container_name: mongo-2-dev
+    env_file:
+      - .env.dev
+
+  mongoclient:
+    container_name: mongoclient-dev
+    env_file:
+      - .env.dev
