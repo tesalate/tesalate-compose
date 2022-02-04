@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   api:
+    image: devintyler2626/tesalate-api:staging
     container_name: api-staging
     env_file:
       - .env.staging
