@@ -9,6 +9,7 @@ services:
     command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
 
   data-collector:
+    image: devintyler2626/tesalate-data-collector:latest
     container_name: data-collector-prod
     env_file:
       - .env.prod
