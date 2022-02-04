@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: api-prod
+    env_file:
+      - .env.prod
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+
+  data-collector:
+    container_name: data-collector-prod
+    env_file:
+      - .env.prod
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+
+  mongo-0:
+    container_name: mongo-0-prod
+    env_file:
+      - .env.prod
+
+  mongo-1:
+    container_name: mongo-1-prod
+    env_file:
+      - .env.prod
+
+  mongo-2:
+    container_name: mongo-2-prod
+    env_file:
+      - .env.prod
+
+  mongoclient:
+    container_name: mongoclient-prod
+    env_file:
+      - .env.prod
