@@ -26,7 +26,7 @@ let BUILD_ENVIRONMENT = 'dev';
 let PUBLIC_URL = 'http://localhost:4400';
 let APP_NAME = 'Tesalate';
 let API_PORT = 4400;
-let MONGO_PORT = 27017;
+let MONGO_HOST_PORT = 27017;
 let MONGO_INITDB_ROOT_USERNAME = 'root';
 let MONGO_INITDB_ROOT_PASSWORD = '1234';
 let BASE_MONGO_INITDB_DATABASE = 'tesla_db';
@@ -140,11 +140,11 @@ async function askAppName() {
 
 async function askMongoQuestions() {
   const answer0 = await inquirer.prompt({
-    name: 'mongo_port',
+    name: 'MONGO_HOST_PORT',
     type: 'input',
     message: 'What host port should mongo run on?',
     default() {
-      return MONGO_PORT;
+      return MONGO_HOST_PORT;
     },
   });
 
@@ -202,7 +202,7 @@ async function askMongoQuestions() {
     },
   });
 
-  MONGO_PORT = answer0.mongo_port;
+  MONGO_HOST_PORT = answer0.MONGO_HOST_PORT;
   MONGO_INITDB_ROOT_USERNAME = answer1.root_user;
   MONGO_INITDB_ROOT_PASSWORD = answer2.root_pass;
   BASE_MONGO_INITDB_DATABASE = answer3.db_name;
@@ -463,7 +463,7 @@ PUBLIC_URL=${PUBLIC_URL}
 APP_NAME=${APP_NAME}
 
 ## Mongo DB
-MONGO_PORT=${MONGO_PORT}
+MONGO_HOST_PORT=${MONGO_HOST_PORT}
 # DO NOT CHANGE ROOT USER AFTER INITIAL RUN AS ROOT USER IS ONLY ADDED IF NOTHING IS IN THE DB
 MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
 MONGO_INITDB_ROOT_PASSWORD="${MONGO_INITDB_ROOT_PASSWORD}"
