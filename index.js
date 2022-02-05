@@ -25,6 +25,8 @@ let startDocker = false;
 let BUILD_ENVIRONMENT = 'dev';
 let PUBLIC_URL = 'http://localhost:4400';
 let APP_NAME = 'Tesalate';
+let API_PORT = 4400;
+let MONGO_PORT = 27017;
 let MONGO_INITDB_ROOT_USERNAME = 'root';
 let MONGO_INITDB_ROOT_PASSWORD = '1234';
 let BASE_MONGO_INITDB_DATABASE = 'tesla_db';
@@ -137,6 +139,15 @@ async function askAppName() {
 }
 
 async function askMongoQuestions() {
+  const answer0 = await inquirer.prompt({
+    name: 'mongo_port',
+    type: 'input',
+    message: 'What host port should mongo run on?',
+    default() {
+      return MONGO_PORT;
+    },
+  });
+
   const answer1 = await inquirer.prompt({
     name: 'root_user',
     type: 'input',
@@ -191,6 +202,7 @@ async function askMongoQuestions() {
     },
   });
 
+  MONGO_PORT = answer0.mongo_port;
   MONGO_INITDB_ROOT_USERNAME = answer1.root_user;
   MONGO_INITDB_ROOT_PASSWORD = answer2.root_pass;
   BASE_MONGO_INITDB_DATABASE = answer3.db_name;
@@ -208,6 +220,15 @@ async function askGenerateHash() {
   });
 
   generateHash = answers.default_all === 'yes';
+}
+
+async function askAPIPort() {
+  const answer1 = await inquirer.prompt({
+    name: 'api_port',
+    type: 'input',
+    message: 'Port to access API on?',
+  });
+  API_PORT = answer1.api_port;
 }
 
 async function askJWTQuestions() {
@@ -416,6 +437,7 @@ if (overwriteEnvs) {
     await askAppName();
     await askMongoQuestions();
     await askGenerateHash();
+    await askAPIPort();
     await askJWTQuestions();
     await askEmailQuestions();
     await askTeslaAPIQuestions();
@@ -441,18 +463,20 @@ PUBLIC_URL=${PUBLIC_URL}
 APP_NAME=${APP_NAME}
 
 ## Mongo DB
+MONGO_PORT=${MONGO_PORT}
 # DO NOT CHANGE ROOT USER AFTER INITIAL RUN AS ROOT USER IS ONLY ADDED IF NOTHING IS IN THE DB
 MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-# DO NOT CHANGE ROOT PASS AFTER INITIAL RUN AS ROOT PASS IS ONLY ADDED IF NOTHING IS IN THE DB
 MONGO_INITDB_ROOT_PASSWORD="${MONGO_INITDB_ROOT_PASSWORD}"
 BASE_MONGO_INITDB_DATABASE=${BASE_MONGO_INITDB_DATABASE}
 MONGO_REPLICA_SET_NAME=${MONGO_REPLICA_SET_NAME}
-
 ## Mongo DB user
 MONGO_INITDB_USERNAME=${MONGO_INITDB_USERNAME}
 MONGO_INITDB_PASSWORD="${MONGO_INITDB_PASSWORD}"
 
 MONGODB_URL="mongodb://${MONGO_INITDB_USERNAME}:${MONGO_INITDB_PASSWORD}@mongo-0:27017/${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT}?replicaSet=${MONGO_REPLICA_SET_NAME}&readPreference=primaryPreferred&authSource=${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT}"
+
+## API
+API_PORT=${API_PORT}
 
 ## JWT
 JWT_SECRET="${JWT_SECRET}"
@@ -465,7 +489,6 @@ JWT_RESET_PASSWORD_EXPIRATION_MINUTES=${JWT_RESET_PASSWORD_EXPIRATION_MINUTES}
 # Number of minutes after which a verify email token expires
 JWT_VERIFY_EMAIL_EXPIRATION_MINUTES=${JWT_VERIFY_EMAIL_EXPIRATION_MINUTES}
 
-
 # SMTP configuration options for the email service
 # For testing, you can use a fake SMTP service like Ethereal: https://ethereal.email/create
 SMTP_HOST=${SMTP_HOST}
@@ -474,11 +497,11 @@ SMTP_USERNAME=${SMTP_USERNAME}
 SMTP_PASSWORD="${SMTP_PASSWORD}"
 EMAIL_FROM="${EMAIL_FROM}"
 
-## TESLA OWN API
+## TESLA API
 TESLA_OAUTH_V3_URL=${TESLA_OAUTH_V3_URL}
 TESLA_OWNER_API_URL=${TESLA_OWNER_API_URL}
 TESLA_OWNERAPI_CLIENT_ID=${TESLA_OWNERAPI_CLIENT_ID}
-TESLA_OWNERAPI_CLIENT_SECRET= ${TESLA_OWNERAPI_CLIENT_SECRET}
+TESLA_OWNERAPI_CLIENT_SECRET=${TESLA_OWNERAPI_CLIENT_SECRET}
 
 ## CORS
 ACCEPTED_CORS=[${ACCEPTED_CORS}]

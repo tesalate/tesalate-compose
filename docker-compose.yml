@@ -10,7 +10,7 @@ services:
       - ../main-api:/home/node/app/
     container_name: api
     ports:
-      - '4400:4400'
+      - '${API_PORT}:4400'
     depends_on:
       - mongo-0
     links:
@@ -21,10 +21,10 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: curl --fail http://api:4400 || exit 1 
+      test: curl --fail http://api:${API_PORT} || exit 1 
       interval: 10s
       start_period: 30s  
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn dev -L"]
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:${MONGO_PORT:-27017} -- yarn dev -L"]
 
   data-collector:
     build:
@@ -41,14 +41,14 @@ services:
       - mongo-0
     networks:
       - main-network
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn dev -L"]
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:${MONGO_PORT:-27017} -- yarn dev -L"]
 
   mongo-0:
     hostname: 'mongodb'
     container_name: 'mongo-0'
     image: 'mongo:5.0.3'
     ports:
-      - 27017:27017
+      - ${MONGO_PORT:-27017}:27017
     networks:
       - main-network
     environment:
@@ -60,7 +60,7 @@ services:
       - ../mongo/scripts/create-user.sh:/docker-entrypoint-initdb.d/create-user.sh
       - ../mongo/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo mongo-0:27017/${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT} --quiet
+      test: echo 'db.runCommand("ping").ok' | mongo mongo-0:${MONGO_PORT:-27017}/${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT} --quiet
       interval: 10s
       start_period: 30s
     restart: always
@@ -73,8 +73,6 @@ services:
     hostname: 'mongodb'
     container_name: 'mongo-1'
     image: 'mongo:5.0.3'
-    ports:
-      - 27018:27017
     networks:
       - main-network
     volumes:
@@ -86,13 +84,11 @@ services:
     hostname: 'mongodb'
     container_name: 'mongo-2'
     image: 'mongo:5.0.3'
-    ports:
-        - 27019:27017
     networks:
       - main-network
     volumes:
-        - ../mongo/${BUILD_ENVIRONMENT}/data/mongo-2/:/data/db
-        - ../mongo/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
+      - ../mongo/${BUILD_ENVIRONMENT}/data/mongo-2/:/data/db
+      - ../mongo/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
 
   mongoclient:
@@ -117,7 +113,7 @@ services:
     container_name: mongo-express
     restart: unless-stopped
     environment:
-      ME_CONFIG_MONGODB_URL: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo-0,mongo-1,mongo-2:27017/${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT}?replicaSet=${MONGO_REPLICA_SET_NAME}&readPreference=primaryPreferred&authSource=admin"
+      ME_CONFIG_MONGODB_URL: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo-0,mongo-1,mongo-2:${MONGO_PORT:-27017}/${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT}?replicaSet=${MONGO_REPLICA_SET_NAME}&readPreference=primaryPreferred&authSource=admin"
       ME_CONFIG_MONGODB_AUTH_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       ME_CONFIG_MONGODB_AUTH_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
