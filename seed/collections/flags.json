@@ -1,0 +1,8 @@
+[
+  {
+    "_id": "6206a2c966e70c2f71dffaef",
+    "type": "warning",
+    "systemName": "session_generated_from_historic_data",
+    "message": "This session was created from historic data before sessions were implemented and may be inaccurate and missing data"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "6206ac9389e76d0045c71cf3",
+    "role": "user",
+    "isEmailVerified": false,
+    "teslaAccount": "6206a2cb66e70c2f71dffaf6",
+    "username": "test",
+    "firstName": "test",
+    "lastName": "user",
+    "email": "test@example.com",
+    "password": "$2a$08$h7pKjdlZLp2TujpATZqIR.S/ESKHoC3FLfDhx0CUfrjt0j01ddCfi",
+    "displayName": "test"
+  }
+]

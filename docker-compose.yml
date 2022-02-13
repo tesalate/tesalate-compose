@@ -3,11 +3,11 @@ version: '3.9'
 services:
   api:
     build:
-      context: ../main-api/
+      context: ../tesalate-api/
       dockerfile: Dockerfile
     volumes:
       - ./logs/api:/home/node/app/logs
-      - ../main-api:/home/node/app/
+      - ../tesalate-api:/home/node/app/
     container_name: api
     ports:
       - '${API_PORT}:4400'
@@ -28,10 +28,10 @@ services:
 
   data-collector:
     build:
-      context: ../main-datacollector/
+      context: ../tesalate-data-collector/
       dockerfile: Dockerfile
     volumes:
-      - ../main-datacollector/:/home/node/app/
+      - ../tesalate-data-collector/:/home/node/app/
     container_name: data-collector
     env_file:
       - .env
@@ -90,7 +90,7 @@ services:
       - ../mongo/${BUILD_ENVIRONMENT}/data/mongo-2/:/data/db
       - ../mongo/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
-
+    
   mongoclient:
     image: mongo:5.0.3
     container_name: 'mongo-client'

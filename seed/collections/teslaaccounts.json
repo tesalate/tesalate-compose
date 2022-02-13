@@ -1,0 +1,10 @@
+[
+  {
+    "_id": "6206a2cb66e70c2f71dffaf6",
+    "linked": true,
+    "email": "test@example.com",
+    "access_token": "",
+    "refresh_token": "",
+    "user": "6206ac9389e76d0045c71cf3"
+  }
+]

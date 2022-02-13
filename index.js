@@ -1,13 +1,13 @@
 #!/usr/bin/env node
+
 import fs from 'fs';
 import util from 'util';
 import path from 'path';
 import crypto from 'crypto';
-import child_process from 'child_process';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import inquirer from 'inquirer';
-import gradient from 'gradient-string';
+import child_process from 'child_process';
 import chalkAnimation from 'chalk-animation';
 import { createSpinner } from 'nanospinner';
 import { fileURLToPath } from 'url';
@@ -18,10 +18,12 @@ const __dirname = path.dirname(__filename);
 const exec = util.promisify(child_process.exec);
 
 let PATH = path.resolve(__dirname, '..');
+let repos = ['tesalate-compose', 'tesalate-api', 'tesalate-data-collector', 'mongo'];
 let defaultAll = false;
 let overwriteEnvs = true;
 let generateHash = false;
 let startDocker = false;
+let seedDb = false;
 let BUILD_ENVIRONMENT = 'dev';
 let PUBLIC_URL = 'http://localhost:4400';
 let APP_NAME = 'Tesalate';
@@ -84,7 +86,7 @@ async function envSelect() {
     name: 'question_1',
     type: 'list',
     message: 'Choose an environment\n',
-    choices: ['prod', 'staging', 'dev'],
+    choices: ['dev', 'staging', new inquirer.Separator(), 'prod'],
   });
 
   BUILD_ENVIRONMENT = answers.question_1;
@@ -383,8 +385,37 @@ async function askStartDocker() {
   startDocker = answers.start_docker === 'yes';
 }
 
+async function askSeedDB() {
+  const answers = await inquirer.prompt({
+    name: 'seed_db',
+    type: 'list',
+    message: 'Seed the DB with example data? You can always seed data later on by running "node --experimental-json-modules ./seed/seed.js" the root of this directory\n',
+    choices: ['yes', 'no'],
+  });
+
+  seedDb = answers.seed_db === 'yes';
+}
+
 await welcome();
 await pathSelect();
+
+const missingRepos = repos.reduce((acc, curr) => {
+  if (!fs.existsSync(`${PATH}/${curr}`)) {
+    return [...acc, `${curr} -> https://github.com/tesalate/${curr}`];
+  }
+  return acc;
+}, []);
+
+if (missingRepos.length > 0) {
+  const answer = await inquirer.prompt({
+    name: 'continue',
+    type: 'list',
+    message: 'Please manually clone the following repos before continuing:\n' + missingRepos.join('\n') + '\n',
+    choices: ['continue', 'exit'],
+  });
+  if (answer.continue === 'exit') process.exit(0);
+}
+
 await envSelect();
 
 const envExportPath = `${PATH}/tesalate-compose/.env`;
@@ -532,12 +563,18 @@ try {
     }
     spinner.start({ text: '🐳 Staring Docker 🐳\n' });
     const { stdout, stderr } = await exec(command);
-    if (stderr) {
-      spinner.error({ text: `stderr: ${stderr}` });
-      process.exit(1);
-    }
     console.log(`stdout: ${stdout}`);
     spinner.success({ text: `Docker has started` });
+    await askSeedDB();
+    if (seedDb) {
+      spinner.start({ text: 'Seeding DB' });
+      const { stdout: success, stderr: err } = await exec('node --experimental-json-modules ./seed/seed.js');
+      if (err) {
+        console.error(err);
+      }
+      spinner.success({ text: 'Done' });
+      console.log(success);
+    }
   }
 } catch (err) {
   console.error(err);
