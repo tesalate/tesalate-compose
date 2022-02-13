@@ -1,0 +1,23 @@
+[
+  {
+    "_id": "5cef2b3fb0171d159c515e4d",
+    "teslaAccount": "6206a2cb66e70c2f71dffaf6",
+    "collectData": false,
+    "display_name": "eva",
+    "tokens": ["63d6274062b917b6", "e0719da99be740fc"],
+    "id_s": "2492931164594966",
+    "id": 2492931164594966,
+    "vehicle_id": 1164909924,
+    "vin": "6YJ3E2ED5KF486158",
+    "option_codes": "AD15,MDL3,PBSB,RENA,BT37,ID3W,RF3G,S3PB,DRLH,DV2W,W39B,APF0,COUS,BC3B,CH07,PC30,FC3P,FG31,GLFR,HL31,HM31,IL31,LTPB,MR31,FM3B,RS3H,SA3P,STCP,SC04,SU3C,T3CA,TW00,TM00,UT3P,WR00,AU3P,APH3,AF00,ZCST,MI00,CDM0",
+    "color": null,
+    "access_type": "OWNER",
+    "state": "asleep",
+    "in_service": false,
+    "calendar_enabled": true,
+    "api_version": 22,
+    "backseat_token": null,
+    "backseat_token_updated_at": null,
+    "user": "6206ac9389e76d0045c71cf3"
+  }
+]

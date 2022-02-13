@@ -1,12 +1,15 @@
 {
   "name": "mongo",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "index.js",
   "repository": "https://github.com/tesalate/tesalate-compose.git",
   "author": "Devin Cunningham <dtyler.cunningham@gmail.com>",
   "description": "Start everything needed for tesalate.io",
   "homepage": "https://tesalate.io",
   "type": "module",
+  "engines": {
+    "node": ">=14.8.0"
+  },
   "scripts": {
     "start": "node ."
   },
@@ -15,9 +18,10 @@
     "chalk": "^4.1.2",
     "chalk-animation": "^1.6.0",
     "crypto": "^1.0.1",
+    "dotenv": "^16.0.0",
     "figlet": "^1.5.2",
-    "gradient-string": "^2.0.0",
     "inquirer": "^8.2.0",
+    "mongodb": "^4.3.1",
     "nanospinner": "^1.0.0"
   }
 }
