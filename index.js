@@ -420,8 +420,8 @@ await envSelect();
 
 const envExportPath = `${PATH}/tesalate-compose/.env`;
 const envExists = fs.existsSync(envExportPath);
-const keyfilePath = `${PATH}/mongo/${BUILD_ENVIRONMENT}/keyfile`;
-const dataPath = `${PATH}/mongo/${BUILD_ENVIRONMENT}/data`;
+const keyfilePath = `${PATH}/tesalate-compose/${BUILD_ENVIRONMENT}/keyfile`;
+const dataPath = `${PATH}/tesalate-compose/${BUILD_ENVIRONMENT}/data`;
 const keyExists = fs.existsSync(keyfilePath);
 
 if (envExists) {
