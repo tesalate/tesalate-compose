@@ -78,7 +78,7 @@ services:
     networks:
       - main-network
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/data/mongo-1:/data/db
+      - $PWD/${BUILD_ENVIRONMENT}/data/mongo-2:/data/db
       - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
     
