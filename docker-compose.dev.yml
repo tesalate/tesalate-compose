@@ -2,8 +2,13 @@ version: '3.9'
 
 services:
   api:
+    build:
+      context: ../tesalate-api/
+      dockerfile: Dockerfile
+    volumes:
+      - ./logs/api:/home/node/app/logs
+      - ../tesalate-api:/home/node/app/
     container_name: api
-    image: devintyler2626/tesalate-api:latest
     ports:
       - '${API_PORT}:4400'
     depends_on:
@@ -19,11 +24,15 @@ services:
       test: curl --fail http://api:${API_PORT} || exit 1 
       interval: 10s
       start_period: 30s  
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn dev -L"]
 
   data-collector:
+    build:
+      context: ../tesalate-data-collector/
+      dockerfile: Dockerfile
+    volumes:
+      - ../tesalate-data-collector/:/home/node/app/
     container_name: data-collector
-    image: devintyler2626/tesalate-data-collector:latest
     env_file:
       - .env
     depends_on:
@@ -32,7 +41,7 @@ services:
       - mongo-0
     networks:
       - main-network
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn dev -L"]
 
   mongo-0:
     hostname: 'mongodb'
@@ -47,9 +56,9 @@ services:
     env_file:
       - .env
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/data/mongo-0:/data/db
-      - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
-      - $PWD/scripts/create-user.sh:/docker-entrypoint-initdb.d/create-user.sh
+      - ../mongo/${BUILD_ENVIRONMENT}/data/mongo-0:/data/db
+      - ../mongo/scripts/create-user.sh:/docker-entrypoint-initdb.d/create-user.sh
+      - ../mongo/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongo mongo-0:27017/${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT} --quiet
       interval: 10s
@@ -67,8 +76,8 @@ services:
     networks:
       - main-network
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/data/mongo-1:/data/db
-      - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
+      - ../mongo/${BUILD_ENVIRONMENT}/data/mongo-1:/data/db
+      - ../mongo/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
 
   mongo-2:
@@ -78,8 +87,8 @@ services:
     networks:
       - main-network
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/data/mongo-2:/data/db
-      - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
+      - ../mongo/${BUILD_ENVIRONMENT}/data/mongo-2/:/data/db
+      - ../mongo/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
     
   mongoclient:
@@ -94,8 +103,8 @@ services:
     env_file:
       - .env
     volumes:
-      - $PWD/scripts/init-replica.sh:/deployment_scripts/init-replica.sh
-      - $PWD/${BUILD_ENVIRONMENT}/mongostatus:/data/
+      - ../mongo/scripts/init-replica.sh:/deployment_scripts/init-replica.sh
+      - ../mongo/${BUILD_ENVIRONMENT}/mongostatus:/data/
     entrypoint:
       - /deployment_scripts/init-replica.sh
 
