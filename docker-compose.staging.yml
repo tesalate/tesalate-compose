@@ -1,6 +1,10 @@
 version: '3.8'
 
 services:
+  ui:
+    image: devintyler2626/tesalate-ui:staging
+    container_name: ui-staging
+
   api:
     image: devintyler2626/tesalate-api:staging
     container_name: api-staging

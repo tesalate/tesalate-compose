@@ -1,6 +1,13 @@
 version: '3.9'
 
 services:
+  ui:
+    build:
+      context: ../tesalate-ui/
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
+
   api:
     build:
       context: ../tesalate-api/
