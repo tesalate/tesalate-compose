@@ -103,3 +103,6 @@ dist
 .tern-port
 
 @eaDir
+dev/*
+staging/*
+prod/*
