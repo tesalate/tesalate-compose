@@ -7,17 +7,17 @@ services:
     depends_on:
       - api
     ports:
-      - '80:80'
+      - '${UI_PORT:-8080}:80'
 
   api:
     container_name: api
     image: devintyler2626/tesalate-api:latest
-    depends_on:
-      - mongo-0
-      - mongo-1
-      - mongo-2
-    links:
-      - mongo-0
+    # depends_on:
+    #   - mongo-0
+    #   - mongo-1
+    #   - mongo-2
+    # links:
+    #   - mongo-0
     networks:
       - main-network
     restart: unless-stopped
@@ -29,7 +29,8 @@ services:
       start_period: 30s  
     ports:
       - '${API_PORT}:${API_PORT}'
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    # command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    command: [ "yarn start" ]
 
   data-collector:
     container_name: data-collector
@@ -37,15 +38,16 @@ services:
     restart: always
     env_file:
       - .env
-    depends_on:
-      - mongo-0
-      - mongo-1
-      - mongo-2
-    links:
-      - mongo-0
+    # depends_on:
+    #   - mongo-0
+    #   - mongo-1
+    #   - mongo-2
+    # links:
+    #   - mongo-0
     networks:
       - main-network
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    # command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    command: [ "yarn start" ]
 
   mongo-0:
     hostname: 'mongodb'
@@ -95,15 +97,15 @@ services:
       - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
     
-  mongoclient:
+  mongo-client:
     image: mongo:5.0.3
     container_name: 'mongo-client'
     networks:
       - main-network
-    depends_on:
-      - mongo-0
-      - mongo-1
-      - mongo-2
+    # depends_on:
+    #   - mongo-0
+    #   - mongo-1
+    #   - mongo-2
     env_file:
       - .env
     volumes:
@@ -128,8 +130,8 @@ services:
       - "8081:8081"
     networks:
       - main-network
-    depends_on:
-      - mongo-0
+    # depends_on:
+    #   - mongo-0
       
 networks:
   main-network:
