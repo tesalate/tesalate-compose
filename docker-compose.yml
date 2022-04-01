@@ -18,8 +18,8 @@ services:
     #   - mongo-2
     # links:
     #   - mongo-0
-    networks:
-      - main-network
+    # networks:
+    #   - main-network
     restart: unless-stopped
     env_file:
       - .env
@@ -44,8 +44,8 @@ services:
     #   - mongo-2
     # links:
     #   - mongo-0
-    networks:
-      - main-network
+    # networks:
+    #   - main-network
     # command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
     command: "yarn start"
 
@@ -55,8 +55,8 @@ services:
     image: 'mongo:5.0.3'
     ports:
       - ${MONGO_HOST_PORT:-27017}:27017
-    networks:
-      - main-network
+    # networks:
+    #   - main-network
     environment:
       - MONGO_INITDB_DATABASE=${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT}
     env_file:
@@ -79,8 +79,8 @@ services:
     hostname: 'mongodb'
     container_name: 'mongo-1'
     image: 'mongo:5.0.3'
-    networks:
-      - main-network
+    # networks:
+    #   - main-network
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/data/mongo-1:/data/db
       - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
@@ -90,8 +90,8 @@ services:
     hostname: 'mongodb'
     container_name: 'mongo-2'
     image: 'mongo:5.0.3'
-    networks:
-      - main-network
+    # networks:
+    #   - main-network
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/data/mongo-2:/data/db
       - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
@@ -100,8 +100,8 @@ services:
   mongo-client:
     image: mongo:5.0.3
     container_name: 'mongo-client'
-    networks:
-      - main-network
+    # networks:
+    #   - main-network
     # depends_on:
     #   - mongo-0
     #   - mongo-1
@@ -128,11 +128,11 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_INITDB_PASSWORD}
     ports:
       - "8081:8081"
-    networks:
-      - main-network
+    # networks:
+    #   - main-network
     # depends_on:
     #   - mongo-0
       
-networks:
-  main-network:
-    driver: bridge
+# networks:
+#   main-network:
+#     driver: host
