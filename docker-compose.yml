@@ -30,7 +30,7 @@ services:
     ports:
       - '${API_PORT}:${API_PORT}'
     # command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
-    command: [ "yarn start" ]
+    command: "yarn start" 
 
   data-collector:
     container_name: data-collector
@@ -47,7 +47,7 @@ services:
     networks:
       - main-network
     # command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
-    command: [ "yarn start" ]
+    command: "yarn start"
 
   mongo-0:
     hostname: 'mongodb'
