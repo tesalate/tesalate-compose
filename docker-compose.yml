@@ -149,4 +149,3 @@ services:
       
 networks:
   main-network:
-    driver: host
