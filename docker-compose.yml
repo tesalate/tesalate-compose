@@ -13,10 +13,10 @@ services:
   api:
     container_name: api
     image: devintyler2626/tesalate-api:latest
-    extra_hosts:
-      - "mongo-0:${MONGO_HOST}"
-      - "mongo-1:${MONGO_HOST}"
-      - "mongo-2:${MONGO_HOST}"
+    # extra_hosts:
+    #   - "mongo-0:${MONGO_HOST}"
+    #   - "mongo-1:${MONGO_HOST}"
+    #   - "mongo-2:${MONGO_HOST}"
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/api/logs:/home/node/app/logs
     depends_on:
@@ -44,10 +44,10 @@ services:
     restart: always
     env_file:
       - .env
-    extra_hosts:
-      - "mongo-0:${MONGO_HOST}"
-      - "mongo-1:${MONGO_HOST}"
-      - "mongo-2:${MONGO_HOST}"
+    # extra_hosts:
+    #   - "mongo-0:${MONGO_HOST}"
+    #   - "mongo-1:${MONGO_HOST}"
+    #   - "mongo-2:${MONGO_HOST}"
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/data-collector/logs:/home/node/app/logs
     depends_on:
