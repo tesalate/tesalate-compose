@@ -13,16 +13,13 @@ services:
   api:
     container_name: api
     image: devintyler2626/tesalate-api:latest
-    # extra_hosts:
-    #   - "mongo-0:${MONGO_HOST}"
-    #   - "mongo-1:${MONGO_HOST}"
-    #   - "mongo-2:${MONGO_HOST}"
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/api/logs:/home/node/app/logs
     depends_on:
       - mongo-0
       - mongo-1
       - mongo-2
+      - redis
     links:
       - mongo-0
     networks:
@@ -44,10 +41,6 @@ services:
     restart: always
     env_file:
       - .env
-    # extra_hosts:
-    #   - "mongo-0:${MONGO_HOST}"
-    #   - "mongo-1:${MONGO_HOST}"
-    #   - "mongo-2:${MONGO_HOST}"
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/data-collector/logs:/home/node/app/logs
     depends_on:
@@ -113,7 +106,6 @@ services:
   mongo-client:
     image: mongo:5.0.3
     container_name: 'mongo-client'
-    restart: always
     networks:
       - main-network
     depends_on:
@@ -146,6 +138,20 @@ services:
       - main-network
     depends_on:
       - mongo-0
-      
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '${REDIS_PORT}:6379'
+    healthcheck:
+      test: ["cmd", "redis-cli", "ping"]
+      timeout: 5s
+      retries: 5
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes: 
+      - $PWD/${BUILD_ENVIRONMENT}/redis:/data
+
+
 networks:
   main-network:
