@@ -35,6 +35,9 @@ let BASE_MONGO_INITDB_DATABASE = 'tesla_db';
 let MONGO_REPLICA_SET_NAME = 'rs0';
 let MONGO_INITDB_USERNAME = 'user';
 let MONGO_INITDB_PASSWORD = '4321';
+let REDIS_HOST = 'localhost';
+let REDIS_PORT = '6379';
+let REDIS_PASSWORD = '9876';
 let JWT_SECRET = crypto.randomBytes(256).toString('base64');
 let JWT_ACCESS_EXPIRATION_MINUTES = 90;
 let JWT_REFRESH_EXPIRATION_DAYS = 90;
@@ -211,6 +214,39 @@ async function askMongoQuestions() {
   MONGO_REPLICA_SET_NAME = answer4.replica_set_name;
   MONGO_INITDB_USERNAME = answer5.db_user;
   MONGO_INITDB_PASSWORD = answer6.db_user_pass;
+}
+
+async function askRedisQuestions() {
+  const answer0 = await inquirer.prompt({
+    name: 'REDIS_HOST',
+    type: 'input',
+    message: 'Redis host?',
+    default() {
+      return REDIS_HOST;
+    },
+  });
+
+  const answer1 = await inquirer.prompt({
+    name: 'REDIS_PORT',
+    type: 'input',
+    message: 'What host port should redis run on?',
+    default() {
+      return REDIS_PORT;
+    },
+  });
+
+  const answer2 = await inquirer.prompt({
+    name: 'REDIS_PASSWORD',
+    type: 'input',
+    message: `Password for Redis?`,
+    default() {
+      return REDIS_PASSWORD;
+    },
+  });
+
+  REDIS_HOST = answer0.REDIS_HOST;
+  REDIS_PORT = answer1.REDIS_PORT;
+  MONGO_INITDB_ROOT_USERNAME = answer2.REDIS_PASSWORD;
 }
 
 async function askGenerateHash() {
@@ -398,30 +434,13 @@ async function askSeedDB() {
 
 await welcome();
 await pathSelect();
-
-const missingRepos = repos.reduce((acc, curr) => {
-  if (!fs.existsSync(`${PATH}/${curr}`)) {
-    return [...acc, `${curr} -> https://github.com/tesalate/${curr}`];
-  }
-  return acc;
-}, []);
-
-if (missingRepos.length > 0) {
-  const answer = await inquirer.prompt({
-    name: 'continue',
-    type: 'list',
-    message: 'Please manually clone the following repos before continuing:\n' + missingRepos.join('\n') + '\n',
-    choices: ['continue', 'exit'],
-  });
-  if (answer.continue === 'exit') process.exit(0);
-}
-
 await envSelect();
 
 const envExportPath = `${PATH}/tesalate-compose/.env`;
 const envExists = fs.existsSync(envExportPath);
 const keyfilePath = `${PATH}/tesalate-compose/${BUILD_ENVIRONMENT}/keyfile`;
 const dataPath = `${PATH}/tesalate-compose/${BUILD_ENVIRONMENT}/data`;
+const redisPath = `${PATH}/tesalate-compose/${BUILD_ENVIRONMENT}/redis`;
 const keyExists = fs.existsSync(keyfilePath);
 
 if (envExists) {
@@ -431,6 +450,7 @@ if (envExists) {
 await exec(`mkdir -p ${dataPath}/mongo-0`);
 await exec(`mkdir -p ${dataPath}/mongo-1`);
 await exec(`mkdir -p ${dataPath}/mongo-2`);
+await exec(`mkdir -p ${redisPath}`);
 
 if (!keyExists) {
   spinner.start({ text: 'Creating keyfile for mongo\n' });
@@ -467,6 +487,7 @@ if (overwriteEnvs) {
     await askPublicUrl();
     await askAppName();
     await askMongoQuestions();
+    await askRedisQuestions();
     await askGenerateHash();
     await askAPIPort();
     await askJWTQuestions();
@@ -505,6 +526,11 @@ MONGO_INITDB_USERNAME=${MONGO_INITDB_USERNAME}
 MONGO_INITDB_PASSWORD="${MONGO_INITDB_PASSWORD}"
 
 MONGODB_URL="mongodb://${MONGO_INITDB_USERNAME}:${MONGO_INITDB_PASSWORD}@mongo-0:27017/${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT}?replicaSet=${MONGO_REPLICA_SET_NAME}&readPreference=primaryPreferred&authSource=${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT}"
+
+## REDIS
+REDIS_HOST=${REDIS_HOST}
+REDIS_PORT=${REDIS_PORT}
+REDIS_PASSWORD=${REDIS_PASSWORD}
 
 ## API
 API_PORT=${API_PORT}
