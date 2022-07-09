@@ -144,10 +144,10 @@ services:
     restart: always
     ports:
       - '${REDIS_PORT}:6379'
-    healthcheck:
-      test: ["cmd", "redis-cli", "ping"]
-      timeout: 5s
-      retries: 5
+    # healthcheck:
+    #   test: redis-cli ping
+    #   timeout: 5s
+    #   retries: 5
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     volumes: 
       - $PWD/${BUILD_ENVIRONMENT}/redis:/data
