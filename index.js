@@ -25,6 +25,7 @@ let generateHash = false;
 let startDocker = false;
 let seedDb = false;
 let BUILD_ENVIRONMENT = 'dev';
+let LOG_LEVEL = 'info';
 let PUBLIC_URL = 'http://localhost:4400';
 let APP_NAME = 'Tesalate';
 let API_PORT = 4400;
@@ -37,6 +38,7 @@ let MONGO_INITDB_USERNAME = 'user';
 let MONGO_INITDB_PASSWORD = '4321';
 let REDIS_HOST = 'localhost';
 let REDIS_PORT = '6379';
+let REDIS_USER = 'default';
 let REDIS_PASSWORD = '9876';
 let JWT_SECRET = crypto.randomBytes(256).toString('base64');
 let JWT_ACCESS_EXPIRATION_MINUTES = 90;
@@ -93,6 +95,17 @@ async function envSelect() {
   });
 
   BUILD_ENVIRONMENT = answers.question_1;
+}
+
+async function logLevel() {
+  const answers = await inquirer.prompt({
+    name: 'question_1',
+    type: 'list',
+    message: 'Choose log level\n',
+    choices: ['silly', 'debug', 'verbose', 'info', 'warn', 'error'],
+  });
+
+  LOG_LEVEL = answers.question_1;
 }
 
 async function askOverwriteEnvs() {
@@ -236,6 +249,15 @@ async function askRedisQuestions() {
   });
 
   const answer2 = await inquirer.prompt({
+    name: 'REDIS_USER',
+    type: 'input',
+    message: 'Username for redis?',
+    default() {
+      return REDIS_USER;
+    },
+  });
+
+  const answer3 = await inquirer.prompt({
     name: 'REDIS_PASSWORD',
     type: 'input',
     message: `Password for Redis?`,
@@ -246,7 +268,8 @@ async function askRedisQuestions() {
 
   REDIS_HOST = answer0.REDIS_HOST;
   REDIS_PORT = answer1.REDIS_PORT;
-  MONGO_INITDB_ROOT_USERNAME = answer2.REDIS_PASSWORD;
+  REDIS_USER = answer2.REDIS_USER;
+  REDIS_PASSWORD = answer3.REDIS_PASSWORD;
 }
 
 async function askGenerateHash() {
@@ -435,6 +458,7 @@ async function askSeedDB() {
 await welcome();
 await pathSelect();
 await envSelect();
+await logLevel();
 
 const envExportPath = `${PATH}/tesalate-compose/.env`;
 const envExists = fs.existsSync(envExportPath);
@@ -509,6 +533,7 @@ const content = `
 ${fig.replace(/^/gm, '# ')}
 
 BUILD_ENVIRONMENT=${BUILD_ENVIRONMENT}
+LOG_LEVEL=${LOG_LEVEL}
 
 ## Public
 PUBLIC_URL=${PUBLIC_URL}
@@ -530,6 +555,7 @@ MONGODB_URL="mongodb://${MONGO_INITDB_USERNAME}:${MONGO_INITDB_PASSWORD}@mongo-0
 ## REDIS
 REDIS_HOST=${REDIS_HOST}
 REDIS_PORT=${REDIS_PORT}
+REDIS_USER=${REDIS_USER}
 REDIS_PASSWORD=${REDIS_PASSWORD}
 
 ## API
