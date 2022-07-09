@@ -38,7 +38,7 @@ services:
       - $PWD/${BUILD_ENVIRONMENT}/processor/logs:/home/node/app/logs
     networks:
       - main-network
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    command: yarn start
 
 networks:
   main-network:
