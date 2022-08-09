@@ -39,6 +39,8 @@ services:
       test: redis-cli ping
       timeout: 5s
       retries: 5
+    networks:
+      - main-network
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     volumes: 
       - $PWD/${BUILD_ENVIRONMENT}/redis:/data
