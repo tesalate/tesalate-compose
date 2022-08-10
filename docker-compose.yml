@@ -30,6 +30,18 @@ services:
       - '${API_PORT}:${API_PORT}'
     command: [ "bash", "-c", "yarn start"]
 
+  processor:
+    container_name: processor
+    image: devintyler2626/tesalate-processor:latest
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - $PWD/${BUILD_ENVIRONMENT}/processor/logs:/home/node/app/logs
+    networks:
+      - main-network
+    command: yarn start
+
   api-cache:
     image: redis:6.2-alpine
     restart: always
