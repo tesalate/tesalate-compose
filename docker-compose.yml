@@ -44,7 +44,7 @@ services:
 
   processor:
     container_name: processor
-    build:
+    # build:
       # context: ../tesalate-processor/
       # dockerfile: Dockerfile
     image: devintyler2626/tesalate-processor:latest
