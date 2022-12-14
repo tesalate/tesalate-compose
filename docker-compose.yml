@@ -45,8 +45,8 @@ services:
   processor:
     container_name: processor
     # build:
-      # context: ../tesalate-processor/
-      # dockerfile: Dockerfile
+    #   context: ../tesalate-processor/
+    #   dockerfile: Dockerfile
     image: devintyler2626/tesalate-processor:latest
     restart: always
     env_file:
@@ -68,7 +68,7 @@ services:
   mongo-0:
     hostname: 'mongodb'
     container_name: 'mongo-0'
-    image: 'mongo:4.4.18'
+    image: 'mongo:4.4'
     ports:
       - ${MONGO_HOST_PORT:-27017}:27017
     networks:
@@ -94,7 +94,7 @@ services:
   mongo-1:
     hostname: 'mongodb'
     container_name: 'mongo-1'
-    image: 'mongo:4.4.18'
+    image: 'mongo:4.4'
     networks:
       - main-network
     restart: always
@@ -106,7 +106,7 @@ services:
   mongo-2:
     hostname: 'mongodb'
     container_name: 'mongo-2'
-    image: 'mongo:4.4.18'
+    image: 'mongo:4.4'
     networks:
       - main-network
     restart: always
@@ -116,7 +116,7 @@ services:
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
     
   mongo-client:
-    image: mongo:4.4.18
+    image: mongo:4.4
     container_name: 'mongo-client'
     networks:
       - main-network
