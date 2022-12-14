@@ -6,7 +6,7 @@ services:
     build:
       context: ../tesalate-ui/
       dockerfile: Dockerfile
-    # image: devintyler2626/tesalate-ui:latest
+    image: devintyler2626/tesalate-ui:latest
     restart: always
     depends_on:
       - api
@@ -18,7 +18,7 @@ services:
     build:
       context: ../tesalate-api/
       dockerfile: Dockerfile
-    # image: devintyler2626/tesalate-api:latest
+    image: devintyler2626/tesalate-api:latest
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/api/logs:/home/node/app/logs
     depends_on:
@@ -47,7 +47,7 @@ services:
     build:
       context: ../tesalate-processor/
       dockerfile: Dockerfile
-    # image: devintyler2626/tesalate-processor:latest
+    image: devintyler2626/tesalate-processor:latest
     restart: always
     env_file:
       - .env
