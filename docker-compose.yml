@@ -3,9 +3,9 @@ version: '3.9'
 services:
   ui:
     container_name: ui
-    build:
-      context: ../tesalate-ui/
-      dockerfile: Dockerfile
+    # build:
+    #   context: ../tesalate-ui/
+    #   dockerfile: Dockerfile
     image: devintyler2626/tesalate-ui:latest
     restart: always
     depends_on:
@@ -15,9 +15,9 @@ services:
 
   api:
     container_name: api
-    build:
-      context: ../tesalate-api/
-      dockerfile: Dockerfile
+    # build:
+    #   context: ../tesalate-api/
+    #   dockerfile: Dockerfile
     image: devintyler2626/tesalate-api:latest
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/api/logs:/home/node/app/logs
@@ -45,8 +45,8 @@ services:
   processor:
     container_name: processor
     build:
-      context: ../tesalate-processor/
-      dockerfile: Dockerfile
+      # context: ../tesalate-processor/
+      # dockerfile: Dockerfile
     image: devintyler2626/tesalate-processor:latest
     restart: always
     env_file:
