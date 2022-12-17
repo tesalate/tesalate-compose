@@ -14,7 +14,6 @@ services:
       - '${UI_PORT:-80}:80'
 
   api:
-    container_name: api
     # build:
     #   context: ../tesalate-api/
     #   dockerfile: Dockerfile
@@ -38,9 +37,9 @@ services:
       test: wget --no-verbose --tries=1 --spider http://api:4400/health || exit 1 
       interval: 10s
       start_period: 30s  
-    ports:
-      - '${API_PORT}:${API_PORT}'
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    # ports:
+    #   - '${API_PORT}:${API_PORT}'
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- ./wait-for-it.sh redis:6379 -- yarn start"]
 
   processor:
     container_name: processor
@@ -63,7 +62,7 @@ services:
       - redis
     networks:
       - main-network
-    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- yarn start"]
+    command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- ./wait-for-it.sh redis:6379 -- yarn start"]
 
   mongo-0:
     hostname: 'mongodb'
@@ -168,6 +167,18 @@ services:
     volumes: 
       - $PWD/${BUILD_ENVIRONMENT}/redis:/data
 
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+    links:
+      - api
+    ports:
+      - "4400:4400"
+    networks:
+      - main-network
 
 networks:
   main-network:
