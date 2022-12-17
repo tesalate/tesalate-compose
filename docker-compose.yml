@@ -18,6 +18,8 @@ services:
     #   context: ../tesalate-api/
     #   dockerfile: Dockerfile
     image: devintyler2626/tesalate-api:latest
+    environment:
+      - NODE_ENV=productionss
     volumes:
       - $PWD/${BUILD_ENVIRONMENT}/api/logs:/home/node/app/logs
     depends_on:
