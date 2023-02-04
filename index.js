@@ -51,6 +51,9 @@ let SMTP_PORT = 587;
 let SMTP_USERNAME = 'shaun.senger25@ethereal.email';
 let SMTP_PASSWORD = '1234'; // THIS WILL NOT WORK
 let EMAIL_FROM = `${APP_NAME} <noreply@${APP_NAME}.io>`;
+let SMS_FROM = ''; // THIS WILL NOT WORK
+let TWILIO_ACCOUNT_SID = ''; // THIS WILL NOT WORK
+let TWILIO_AUTH_TOKEN = ''; // THIS WILL NOT WORK
 let TESLA_OAUTH_V3_URL = 'https://auth.tesla.com/oauth2/v3';
 let TESLA_OWNER_API_URL = 'https://owner-api.teslamotors.com/api/1';
 let TESLA_OWNERAPI_CLIENT_ID = '81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384';
@@ -398,6 +401,30 @@ async function askEmailQuestions() {
   EMAIL_FROM = answer5.email_from;
 }
 
+async function askSMSQuestions() {
+  const answer1 = await inquirer.prompt({
+    name: 'sms_from',
+    type: 'input',
+    message: 'Twilio "from" number',
+  });
+
+  const answer2 = await inquirer.prompt({
+    name: 'account_sid',
+    type: 'input',
+    message: `Twilio Account SID?`,
+  });
+
+  const answer3 = await inquirer.prompt({
+    name: 'auth_token',
+    type: 'input',
+    message: `Twilio Auth Token?`,
+  });
+
+  SMS_FROM = answer1.sms_from;
+  TWILIO_ACCOUNT_SID = answer2.account_sid;
+  TWILIO_AUTH_TOKEN = answer3.auth_token;
+}
+
 async function askTeslaAPIQuestions() {
   const answer1 = await inquirer.prompt({
     name: 'tesla_oauth_url',
@@ -517,6 +544,7 @@ if (overwriteEnvs) {
     await askAPIPort();
     await askJWTQuestions();
     await askEmailQuestions();
+    await askSMSQuestions();
     await askTeslaAPIQuestions();
     await askCORSQuestions();
   }
@@ -583,6 +611,11 @@ SMTP_PORT=${SMTP_PORT}
 SMTP_USERNAME=${SMTP_USERNAME}
 SMTP_PASSWORD="${SMTP_PASSWORD}"
 EMAIL_FROM="${EMAIL_FROM}"
+
+# TWILIO
+SMS_FROM='${SMS_FROM}'
+TWILIO_ACCOUNT_SID='${TWILIO_ACCOUNT_SID}'
+TWILIO_AUTH_TOKEN='${TWILIO_AUTH_TOKEN}'
 
 ## TESLA API
 TESLA_OAUTH_V3_URL=${TESLA_OAUTH_V3_URL}
