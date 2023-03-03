@@ -223,6 +223,10 @@ services:
       - "4400:4400"
     networks:
       - main-network
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:4400/health || exit 1 
+      interval: 10s
+      start_period: 30s
 
 networks:
   main-network:
