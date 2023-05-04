@@ -73,7 +73,7 @@ services:
       - main-network
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 1
       resources:
         limits:
           memory: 512MB
