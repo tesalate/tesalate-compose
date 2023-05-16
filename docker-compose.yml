@@ -14,9 +14,9 @@ services:
       - '${UI_PORT:-80}:80'
 
   api:
-    # build:
-    #   context: ../tesalate-api/
-    #   dockerfile: Dockerfile
+    build:
+      context: ../tesalate-api/
+      dockerfile: Dockerfile
     image: devintyler2626/tesalate-api:latest
     environment:
       - NODE_ENV=production
@@ -50,9 +50,9 @@ services:
     command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- ./wait-for-it.sh redis:6379 -- yarn start"]
 
   processor:
-    # build:
-    #   context: ../tesalate-processor/
-    #   dockerfile: Dockerfile
+    build:
+      context: ../tesalate-processor/
+      dockerfile: Dockerfile
     image: devintyler2626/tesalate-processor:latest
     restart: always
     env_file:
