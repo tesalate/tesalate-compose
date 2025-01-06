@@ -21,7 +21,7 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/api/logs:/home/node/app/logs
+      - ./${BUILD_ENVIRONMENT}/api/logs:/home/node/app/logs
     depends_on:
       - mongo-0
       - mongo-1
@@ -60,7 +60,7 @@ services:
     # environment:
       # - APP_TYPE=producer
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/producer/logs:/home/node/app/logs
+      - ./${BUILD_ENVIRONMENT}/producer/logs:/home/node/app/logs
     depends_on:
       - mongo-0
       - mongo-1
@@ -92,9 +92,9 @@ services:
     env_file:
       - .env
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/data/mongo-0:/data/db
-      - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
-      - $PWD/scripts/create-user.sh:/docker-entrypoint-initdb.d/create-user.sh
+      - ./${BUILD_ENVIRONMENT}/data/mongo-0:/data/db
+      - ./${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
+      - ./scripts/create-user.sh:/docker-entrypoint-initdb.d/create-user.sh
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongo mongo-0:27017/${BASE_MONGO_INITDB_DATABASE}_${BUILD_ENVIRONMENT} --quiet
       interval: 10s
@@ -117,8 +117,8 @@ services:
       - main-network
     restart: always
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/data/mongo-1:/data/db
-      - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
+      - ./${BUILD_ENVIRONMENT}/data/mongo-1:/data/db
+      - ./${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
     deploy:
       resources:
@@ -133,8 +133,8 @@ services:
       - main-network
     restart: always
     volumes:
-      - $PWD/${BUILD_ENVIRONMENT}/data/mongo-2:/data/db
-      - $PWD/${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
+      - ./${BUILD_ENVIRONMENT}/data/mongo-2:/data/db
+      - ./${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
     deploy:
       resources:
@@ -153,8 +153,8 @@ services:
     env_file:
       - .env
     volumes:
-      - $PWD/scripts/init-replica.sh:/deployment_scripts/init-replica.sh
-      - $PWD/${BUILD_ENVIRONMENT}/mongostatus:/data/
+      - ./scripts/init-replica.sh:/deployment_scripts/init-replica.sh
+      - ./${BUILD_ENVIRONMENT}/mongostatus:/data/
     entrypoint:
       - /deployment_scripts/init-replica.sh
 
@@ -192,7 +192,7 @@ services:
       - main-network
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     volumes: 
-      - $PWD/${BUILD_ENVIRONMENT}/redis:/data
+      - ./${BUILD_ENVIRONMENT}/redis:/data
 
   nginx:
     image: nginx:1.23
