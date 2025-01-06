@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   ui:
     container_name: ui
@@ -42,9 +40,9 @@ services:
     deploy:
       mode: replicated
       replicas: 2
-      resources:
-        limits:
-          memory: 512MB
+      # resources:
+      #   limits:
+      #     memory: 512MB
     # ports:
     #   - '${API_PORT}:${API_PORT}'
     command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- ./wait-for-it.sh redis:6379 -- yarn start"]
@@ -74,9 +72,9 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-      resources:
-        limits:
-          memory: 512MB
+      # resources:
+      #   limits:
+      #     memory: 512MB
     command: [ "bash", "-c", "./wait-for-it.sh mongo-0:27017 -- ./wait-for-it.sh redis:6379 -- yarn start"]
 
   mongo-0:
@@ -104,10 +102,10 @@ services:
       - mongo-1
       - mongo-2
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
-    deploy:
-      resources:
-        limits:
-          memory: 2Gi
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 2Gi
 
   mongo-1:
     hostname: 'mongodb'
@@ -120,10 +118,10 @@ services:
       - ./${BUILD_ENVIRONMENT}/data/mongo-1:/data/db
       - ./${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
-    deploy:
-      resources:
-        limits:
-          memory: 2Gi
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 2Gi
           
   mongo-2:
     hostname: 'mongodb'
@@ -136,10 +134,10 @@ services:
       - ./${BUILD_ENVIRONMENT}/data/mongo-2:/data/db
       - ./${BUILD_ENVIRONMENT}/keyfile/file.key:/auth/file.key
     command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all",  "--keyFile", "/auth/file.key"]
-    deploy:
-      resources:
-        limits:
-          memory: 2Gi
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 2Gi
               
   mongo-client:
     image: mongo:4.4
